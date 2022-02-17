@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随机器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .box1 {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 展示框 */
+        .box2 {
+            width: 50%;
+            height: 50px;
+            line-height: 50px;
+            font-weight: bold;
+            text-align: center;
+            align-self: center;
+        }
+
+        /* 输入框 */
+        .box3 {
+            width: 50%;
+            height: 40px;
+            align-self: center;
+            display: flex;
+        }
+
+        .text {
+            height: calc(100% - 4px);
+            width: 70%;
+            vertical-align: bottom;
+            outline: none;
+        }
+
+        .btn1 {
+            height: 100%;
+            width: 30%;
+            vertical-align: bottom;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        /* 开始栏 */
+        .btn2 {
+            width: 50%;
+            height: 40px;
+            align-self: center;
+            font-weight: bold;
+        }
+
+        /* 清空 */
+        .btn3 {
+            width: 50%;
+            height: 40px;
+            align-self: center;
+            font-weight: bold;
+        }
+
+        /* 输入展示栏 */
+        .box4 {
+            width: 50%;
+            height: 40%;
+            align-self: center;
+            display: flex;
+            flex-direction: column;
+        }
+
+        li {
+            list-style-type: none;
+            height: 15px;
+            border: 1px;
+            border-radius: 8px;
+            width: calc(100% - 20px);
+            margin: 5px 0;
+            padding: 5px 10px;
+            line-height: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        a {
+            color: rgb(255, 255, 255);
+            height: 15px;
+            line-height: 15px;
+            padding: 0 3px;
+            background-color: #c0c0c0;
+        }
+
+        .nam {
+            align-self: center;
+            font-size: 5px;
+        }
+        .shuomin{
+            align-self: center;
+            font-size: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box1">
+        <div class="shuomin">使用说明:1.输入框输入后点确认 2.重复步骤一 3点击开始</div>
+        <div class="nam">@黄先生</div>
+        <input type="button" class="btn3" value="清空">
+        <input type="button" class="btn2" value="开始">
+        <div class="box3">
+            <input type="text" class="text" placeholder="输入">
+            <input type="button" class="btn1" value="确认">
+        </div>
+        <div class="box2"></div>
+        <ul class="box4">
+        </ul>
+    </div>
+    <script>
+        //确认键
+        var btn1 = document.querySelector(".btn1");
+        //输入框
+        var text = document.querySelector(".text");
+        //结果展示框
+        var box4 = document.querySelector(".box4");
+        //输入数据数组
+        var sum = [];
+        // 1.点击确认收集输入框数据并打印到展示框
+        btn1.onclick = function () {
+            if (text.value == "") {
+                return;
+            }
+            var a = text.value;
+            //判断是否已有数据
+            var cf = sum.some((val) => {
+                if (val == a) {
+                    return true;
+                }
+            })
+            if (!cf) {
+                text.value = "";
+                sum[sum.length] = a;
+                dy();
+                text.innerHTML = "";
+            } else {
+                text.value = "";
+                box2.innerHTML = "重复数据"
+            }
+        }
+        //结果展示区
+        var box2 = document.querySelector(".box2");
+        //确认键
+        var btn2 = document.querySelector(".btn2");
+        var ll = true;
+        //点击开始随机一个结果打印到结果区
+        btn2.onclick = function () {
+            if (sum.length === 0) {
+                return;
+            }
+            //节流函数
+            if (!ll) {
+                return;
+            }
+            ll = false;
+            //每次跳转时间
+            var time = 100;
+            //总时间
+            var times = 1000;
+            var n = 1;
+            var ds = setInterval(function () {
+                if (n * time != times) {
+                    var z = Math.floor(sum.length * Math.random());
+                    box2.innerHTML = sum[z];
+                    qk();
+                    //给选中的结果添加背景颜色
+                    var lis = document.querySelectorAll(".box4>li");
+                    lis[z].style.backgroundColor = "#e5e5e5";
+                    n++;
+                } else {
+                    clearTimeout(ds);
+                    ll = true;
+                }
+            }, time);
+        }
+        //点击删除键删除对应数据
+        box4.onclick = function (e) {
+            if (e.target.nodeName == "A") {
+                sum.splice(e.target.getAttribute("suoyin"), 1);
+            }
+            dy();
+            box2.innerHTML = "";
+        }
+        //点击清空键清空全部数据
+        var btn3 = document.querySelector(".btn3");
+        btn3.onclick = function () {
+            sum = [];
+            box2.innerHTML = "";
+            text.value = ""
+            dy();
+
+        }
+        //输入框获得焦点展示框清空,
+        text.onfocus = function () {
+            box2.innerHTML = "";
+            qk();
+        }
+        //打印展示区函数
+        function dy() {
+            //清空展示区旧数据
+            box4.innerHTML = "";
+            //打印最新数据
+            sum.forEach(function (val, index, arr) {
+                var li = document.createElement("li");
+                li.innerHTML = val;
+                var a = document.createElement("a");
+                a.innerHTML = "删除";
+                a.setAttribute("suoyin", index);
+                li.appendChild(a);
+                box4.appendChild(li);
+            })
+        }
+        //清空结果展示框背景函数
+        function qk() {
+            var lis = document.querySelectorAll(".box4>li");
+            lis.forEach(function (val, index, arr) {
+                val.style.backgroundColor = "transparent";
+            })
+        }
+    </script>
+</body>
+
+</html>
